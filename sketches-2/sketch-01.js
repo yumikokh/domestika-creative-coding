@@ -10,6 +10,8 @@ const settings = {
 };
 
 const sketch = ({ context, width, height }) => {
+  random.setSeed("hogee"); // 同じランダム数字出す
+
   const num = 40;
   const degrees = -30;
 
