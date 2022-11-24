@@ -23,6 +23,13 @@ const sketch = ({ context, width, height }) => {
 
   const bgColor = random.pick(risoColors).hex;
 
+  const mask = {
+    radius: width * 0.4,
+    sides: 3,
+    x: width * 0.5,
+    y: height * 0.58,
+  };
+
   for (let i = 0; i < num; i++) {
     const x = random.range(0, width);
     const y = random.range(0, height);
@@ -43,6 +50,20 @@ const sketch = ({ context, width, height }) => {
   return ({ context, width, height }) => {
     context.fillStyle = bgColor;
     context.fillRect(0, 0, width, height);
+
+    // 三角形
+    context.save();
+    context.translate(mask.x, mask.y);
+
+    // context.beginPath();
+    // context.moveTo(0, -300);
+    // context.lineTo(300, 200);
+    // context.lineTo(-300, 200);
+    // context.closePath();
+    drawPolygon({ context, radius: mask.radius, sides: mask.sides });
+
+    context.restore();
+    context.clip(); // ☆
 
     for (let i = 0; i < rects.length; i++) {
       const rect = rects[i];
@@ -78,6 +99,17 @@ const sketch = ({ context, width, height }) => {
 
       context.restore();
     }
+
+    // 三角形のアウトライン
+
+    context.save();
+    context.translate(mask.x, mask.y);
+    context.lineWidth = 30;
+    context.globalCompositeOperation = "color-burn";
+    context.strokeStyle = rectColors[0];
+    drawPolygon({ context, radius: mask.radius, sides: mask.sides });
+    context.stroke();
+    context.restore();
   };
 };
 
@@ -98,4 +130,21 @@ const drawSkewedRect = ({ context, w = 600, h = 200, degrees = 45 }) => {
   context.stroke();
   context.restore();
 };
+
+const drawPolygon = ({ context, radius = 100, sides = 3 }) => {
+  const slice = (Math.PI * 2) / sides;
+
+  context.beginPath();
+  context.moveTo(0, -radius);
+
+  for (let i = 0; i < sides; i++) {
+    const theta = i * slice - Math.PI * 0.5;
+    const x = Math.cos(theta) * radius;
+    const y = Math.sin(theta) * radius;
+    context.lineTo(x, y);
+  }
+
+  context.closePath();
+};
+
 canvasSketch(sketch, settings);
